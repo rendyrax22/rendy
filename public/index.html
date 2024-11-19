@@ -1,43 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Website</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+        .navbar {
+            margin-bottom: 20px;
+        }
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+        .search-bar {
+            border-radius: 30px;
+            padding: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+        .category-list-item {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .category-list-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #fff;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            border-bottom: 2px solid #ddd;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 15px 0 10px;
+        }
+
+        .product-price {
+            color: #007bff;
+            font-size: 1.2rem;
+        }
+
+        .category-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .category-section h4 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 10px;  /* Reduced gap for tighter spacing */
+        }
+
+        .product-grid .col-md-4 {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Store</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Search Bar -->
+<div class="container mt-4">
+    <input type="text" id="searchInput" class="form-control search-bar" placeholder="Search for products..." onkeyup="searchProducts()">
+</div>
+
+<div class="container mt-4">
+  <div class="row">
+    <!-- Sidebar Category Filter -->
+    <div class="col-md-3 category-section">
+      <h4>Filter by Category</h4>
+      <ul class="list-group" id="categoryList">
+        <li class="list-group-item category-list-item" onclick="filterProducts('All')">All</li>
+        <li class="list-group-item category-list-item" onclick="filterProducts('Electronics')">Electronics</li>
+        <li class="list-group-item category-list-item" onclick="filterProducts('Clothing')">Clothing</li>
+        <li class="list-group-item category-list-item" onclick="filterProducts('Furniture')">Furniture</li>
+      </ul>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="col-md-9">
+      <div class="product-grid" id="productGrid">
+        <!-- Products will be injected here dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // List of products with images
+    const products = [
+        { id: 1, name: "Laptop", category: "Electronics", price: 9990000, imgSrc: "assets/src/laptop.jpg" },
+        { id: 2, name: "Smartphone", category: "Electronics", price: 6990000, imgSrc: "assets/src/Iphone.jpg" },
+        { id: 3, name: "Headphones", category: "Electronics", price: 1500000, imgSrc: "assets/src/headphone.jpg" },
+        { id: 4, name: "Smartwatch", category: "Electronics", price: 2000000, imgSrc: "assets/src/smartwatch.jpg" },
+        { id: 5, name: "Camera", category: "Electronics", price: 4500000, imgSrc: "assets/src/camera.jpg" },
+        { id: 6, name: "Shirt", category: "Clothing", price: 250000, imgSrc: "assets/src/shirt.jpg" },
+        { id: 7, name: "Jacket", category: "Clothing", price: 600000, imgSrc: "assets/src/jaket.jpg" },
+        { id: 8, name: "Jeans", category: "Clothing", price: 400000, imgSrc: "assets/src/jeans.jpg" },
+        { id: 9, name: "Dress", category: "Clothing", price: 700000, imgSrc: "assets/src/dress.jpg" },
+        { id: 10, name: "T-shirt", category: "Clothing", price: 150000, imgSrc: "assets/src/tshirt.jpg" },
+        { id: 11, name: "Sofa", category: "Furniture", price: 5000000, imgSrc: "assets/src/sofa.jpg" },
+        { id: 12, name: "Table", category: "Furniture", price: 1500000, imgSrc: "assets/src/table.png" },
+        { id: 13, name: "Chair", category: "Furniture", price: 1000000, imgSrc: "assets/src/chair.jpg" },
+        { id: 14, name: "Bookshelf", category: "Furniture", price: 1200000, imgSrc: "assets/src/bookself.jpg" },
+        { id: 15, name: "Lamp", category: "Furniture", price: 800000, imgSrc: "assets/src/lamp.jpg" },
+    ];
+
+    // Function to format price as IDR (Rupiah)
+    function formatPrice(price) {
+        return "Rp " + new Intl.NumberFormat('id-ID').format(price);
+    }
+
+    // Function to display products
+    function displayProducts(productList) {
+        const productGrid = document.getElementById('productGrid');
+        productGrid.innerHTML = ''; // Clear current products
+
+        productList.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.classList.add('col-md-4');
+
+            productCard.innerHTML = `
+                <div class="product-card">
+                    <img src="${product.imgSrc}" alt="${product.name}">
+                    <div class="product-title">${product.name}</div>
+                    <div class="product-price">${formatPrice(product.price)}</div>
+                </div>
+            `;
+
+            productGrid.appendChild(productCard);
+        });
+    }
+
+    // Function to filter products by category
+    function filterProducts(category) {
+        let filteredProducts;
+
+        if (category === 'All') {
+            filteredProducts = products;
+        } else {
+            filteredProducts = products.filter(product => product.category === category);
+        }
+
+        displayProducts(filteredProducts);
+    }
+
+    // Function to search products by keyword
+    function searchProducts() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const filteredProducts = products.filter(product =>
+            product.name.toLowerCase().includes(searchInput)
+        );
+        displayProducts(filteredProducts);
+    }
+
+    // Display all products initially
+    displayProducts(products);
+</script>
+
+</body>
 </html>
